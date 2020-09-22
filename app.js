@@ -95,6 +95,22 @@ app.use('/auth', require('./routes/auth'))
 app.use('/stories', require('./routes/stories'))
 
 
-const PORT = 5000
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+    console.log('App running on Server');
+});
 
-app.listen(PORT, console.log('Server running in on server'))
+process.on('unhandledRejection', (err) => {
+    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+    console.log(err.name, err.message);
+    server.close(() => {
+        process.exit(1);
+    });
+});
+
+process.on('SIGTERM', () => {
+    console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+    server.close(() => {
+        console.log('💥 Process terminated!');
+    });
+});
